@@ -2,6 +2,7 @@ package com.tony.footballStats.service;
 
 import com.tony.footballStats.dto.team.TeamDto;
 import com.tony.footballStats.model.Coach;
+import com.tony.footballStats.model.League;
 import com.tony.footballStats.model.Player;
 import com.tony.footballStats.model.Team;
 import com.tony.footballStats.repository.TeamRepository;
@@ -29,7 +30,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void saveTeamFull(TeamDto dto) {
+    public void saveTeamFull(TeamDto dto, League league) {
         // 1. Récupération ou création de l'équipe
         Team team = teamRepository.findById(dto.getId()).orElse(new Team());
 
@@ -45,6 +46,8 @@ public class TeamService {
         team.setClubColors(dto.getClubColors());
         team.setStadium(dto.getStadium());
         team.setLastUpdated(LocalDateTime.now());
+
+        team.setLeague(league);
 
         // Mapping Area
         if (dto.getArea() != null) {

@@ -2,9 +2,8 @@ package com.tony.footballStats.service;
 
 import com.tony.footballStats.dto.team.TeamDto;
 import com.tony.footballStats.dto.team.TeamListResponse;
-import com.tony.footballStats.model.Coach;
-import com.tony.footballStats.model.Player;
-import com.tony.footballStats.model.Team;
+import com.tony.footballStats.model.League;
+import com.tony.footballStats.repository.LeagueRepository;
 import com.tony.footballStats.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +13,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FootballSyncService {
@@ -36,15 +31,34 @@ public class FootballSyncService {
     private TeamRepository teamRepository;
 
     @Autowired
+    private LeagueRepository leagueRepository;
+
+    @Autowired
     private TeamService teamService;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Scheduled(fixedRate = 3600000)
-    public void syncLigue1() {
-        System.out.println("🔄 Début de la synchronisation Ligue 1...");
-        String url = baseUrl + "/competitions/FL1/teams";
+    public void syncAllLeagues() {
+        System.out.println("🌍 Début de la synchronisation globale...");
+
+        // 1. On récupère seulement les ligues actives en BDD
+        List<League> activeLeagues = leagueRepository.findByActiveTrue();
+
+        for (League league : activeLeagues) {
+            System.out.println("🔄 Traitement du championnat : " + league.getName() + " (" + league.getCode() + ")");
+            syncLeague(league);
+
+            // Petite pause entre chaque championnat pour être gentil avec l'API
+            try { Thread.sleep(5000); } catch (InterruptedException e) {}
+        }
+
+        System.out.println("✅ Synchronisation globale terminée.");
+    }
+
+    private void syncLeague(League league) {
+        String url = baseUrl + "/competitions/" + league.getCode() + "/teams";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Auth-Token", apiToken);
@@ -57,18 +71,17 @@ public class FootballSyncService {
 
             if (response.getBody() != null && response.getBody().getTeams() != null) {
                 List<TeamDto> teams = response.getBody().getTeams();
-                System.out.println("📋 " + teams.size() + " équipes trouvées via DTO. Traitement...");
+                System.out.println("   📋 " + teams.size() + " équipes trouvées pour " + league.getCode());
 
                 for (TeamDto dto : teams) {
                     if (shouldUpdateTeam(dto.getId())) {
-                        teamService.saveTeamFull(dto);
+                        // On passe la ligue actuelle pour lier l'équipe
+                        teamService.saveTeamFull(dto, league);
                     }
                 }
             }
-            System.out.println("✅ Synchronisation terminée avec succès.");
         } catch (Exception e) {
-            System.err.println("❌ Erreur de sync : " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("❌ Erreur sync " + league.getName() + " : " + e.getMessage());
         }
     }
 

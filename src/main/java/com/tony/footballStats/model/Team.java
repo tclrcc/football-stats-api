@@ -12,27 +12,26 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "teams")
-// Important pour éviter les boucles infinies avec Lombok et les relations bidirectionnelles
-@EqualsAndHashCode(exclude = {"coach", "players"})
-@ToString(exclude = {"coach", "players"})
+// On exclut 'league', 'coach' et 'players' pour éviter les boucles infinies lors des logs/debug
+@EqualsAndHashCode(exclude = {"coach", "players", "league"})
+@ToString(exclude = {"coach", "players", "league"})
 public class Team {
     @Id
     private Long id;
 
     private String name;
-    private String shortName; // Ajouté depuis le DTO
+    private String shortName;
     private String tla;
     private String crestUrl;
 
     @Column(columnDefinition = "TEXT")
     private String address;
 
-    private String website;   // Ajouté depuis le DTO
+    private String website;
     private Integer foundedYear;
-    private String clubColors; // Ajouté depuis le DTO
+    private String clubColors;
     private String stadium;
 
-    // Champs pour stocker les infos de l'objet "Area" du DTO simplement
     private String areaName;
     private String areaFlagUrl;
 
@@ -40,7 +39,11 @@ public class Team {
 
     // --- RELATIONS ---
 
-    // 1 Equipe a 1 Coach. Si on supprime l'équipe, on supprime le coach (orphanRemoval)
+    // AJOUT ICI : Le lien vers la Ligue
+    @ManyToOne
+    @JoinColumn(name = "league_id")
+    private League league;
+
     @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private Coach coach;
 

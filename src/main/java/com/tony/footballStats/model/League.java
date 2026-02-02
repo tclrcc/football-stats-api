@@ -14,8 +14,14 @@ public class League {
     private Long id;
 
     private String name;    // ex: Premier League
+
+    @Column(unique = true)
+    private String code;    // ex: PL, FL1, SA
+
     private String country; // ex: Angleterre
     private String logoUrl;
+
+    private boolean active = true; // Pour activer/désactiver la synchro
 
     // Relation 1 Ligue → N Équipes
     @OneToMany(mappedBy = "league", cascade = CascadeType.ALL)

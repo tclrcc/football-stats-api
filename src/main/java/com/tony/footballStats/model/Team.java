@@ -1,34 +1,50 @@
 package com.tony.footballStats.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
 @Table(name = "teams")
+// Important pour éviter les boucles infinies avec Lombok et les relations bidirectionnelles
+@EqualsAndHashCode(exclude = {"coach", "players"})
+@ToString(exclude = {"coach", "players"})
 public class Team {
     @Id
     private Long id;
 
     private String name;
+    private String shortName; // Ajouté depuis le DTO
+    private String tla;
+    private String crestUrl;
 
-    private String tla;         // ex: MCI
-    private String crestUrl;    // L'URL du logo
-    private String address;     // L'adresse du club
-    private String stadium;
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
+    private String website;   // Ajouté depuis le DTO
     private Integer foundedYear;
+    private String clubColors; // Ajouté depuis le DTO
+    private String stadium;
+
+    // Champs pour stocker les infos de l'objet "Area" du DTO simplement
+    private String areaName;
+    private String areaFlagUrl;
 
     private LocalDateTime lastUpdated;
 
-    private Integer leagueTitles;
-    private Integer championsLeagueTitles;
+    // --- RELATIONS ---
 
-    @ManyToOne
-    @JoinColumn(name = "league_id")
-    @JsonIgnore
-    private League league;
+    // 1 Equipe a 1 Coach. Si on supprime l'équipe, on supprime le coach (orphanRemoval)
+    @OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Coach coach;
+
+    // 1 Equipe a N Joueurs.
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Player> players = new ArrayList<>();
 }

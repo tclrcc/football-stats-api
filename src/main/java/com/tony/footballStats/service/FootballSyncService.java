@@ -2,6 +2,8 @@ package com.tony.footballStats.service;
 
 import com.tony.footballStats.dto.team.TeamDto;
 import com.tony.footballStats.dto.team.TeamListResponse;
+import com.tony.footballStats.model.Coach;
+import com.tony.footballStats.model.Player;
 import com.tony.footballStats.model.Team;
 import com.tony.footballStats.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FootballSyncService {
@@ -24,18 +30,20 @@ public class FootballSyncService {
     private String apiToken;
 
     @Value("${football.api.base-url}")
-    private String baseUrl; // Utilise la valeur du properties
+    private String baseUrl;
 
     @Autowired
     private TeamRepository teamRepository;
 
     @Autowired
-    private RestTemplate restTemplate; // <--- ON INJECTE LA CONFIGURATION SSL ICI
+    private TeamService teamService;
 
-    @Scheduled(fixedRate = 3600000) // Toutes les heures
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Scheduled(fixedRate = 3600000)
     public void syncLigue1() {
         System.out.println("🔄 Début de la synchronisation Ligue 1...");
-
         String url = baseUrl + "/competitions/FL1/teams";
 
         HttpHeaders headers = new HttpHeaders();
@@ -49,14 +57,11 @@ public class FootballSyncService {
 
             if (response.getBody() != null && response.getBody().getTeams() != null) {
                 List<TeamDto> teams = response.getBody().getTeams();
-                System.out.println("📋 " + teams.size() + " équipes trouvées. Traitement...");
+                System.out.println("📋 " + teams.size() + " équipes trouvées via DTO. Traitement...");
 
                 for (TeamDto dto : teams) {
                     if (shouldUpdateTeam(dto.getId())) {
-                        saveTeam(dto);
-                        // Pas de pause ici car on utilise les données de la liste 'teams'
-                        // qui contient déjà l'essentiel (Nom, Logo, ID, etc.)
-                        // Si vous voulez les détails (Coach/Effectif), il faudra refaire un appel + sleep
+                        teamService.saveTeamFull(dto);
                     }
                 }
             }
@@ -72,21 +77,5 @@ public class FootballSyncService {
                 .map(team -> team.getLastUpdated() == null ||
                         team.getLastUpdated().isBefore(LocalDateTime.now().minusDays(7)))
                 .orElse(true);
-    }
-
-    private void saveTeam(TeamDto dto) {
-        Team team = teamRepository.findById(dto.getId()).orElse(new Team());
-
-        team.setId(dto.getId());
-        team.setAddress(dto.getAddress());
-        team.setName(dto.getName());
-        team.setTla(dto.getTla());
-        team.setCrestUrl(dto.getCrestUrl());
-        team.setFoundedYear(dto.getFounded());
-        team.setStadium(dto.getStadium());
-        team.setLastUpdated(LocalDateTime.now());
-
-        teamRepository.save(team);
-        System.out.println("💾 Équipe sauvegardée : " + dto.getName());
     }
 }

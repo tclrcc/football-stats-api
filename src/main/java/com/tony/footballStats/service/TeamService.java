@@ -1,10 +1,7 @@
 package com.tony.footballStats.service;
 
 import com.tony.footballStats.dto.team.TeamDto;
-import com.tony.footballStats.model.Coach;
-import com.tony.footballStats.model.League;
-import com.tony.footballStats.model.Player;
-import com.tony.footballStats.model.Team;
+import com.tony.footballStats.model.*;
 import com.tony.footballStats.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -79,7 +76,8 @@ public class TeamService {
                         Player p = new Player();
                         p.setId(pDto.getId());
                         p.setName(pDto.getName());
-                        p.setPosition(pDto.getPosition());
+                        // Enregistrement de l'enum
+                        p.setPosition(Position.fromApiLabel(pDto.getPosition()));
                         p.setNationality(pDto.getNationality());
                         p.setDateOfBirth(parseDate(pDto.getDateOfBirth()));
                         p.setTeam(team);

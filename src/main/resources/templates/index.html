@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Football Stats - Accueil</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .team-card:hover { transform: scale(1.05); transition: 0.3s; cursor: pointer; border-color: #0d6efd; }
+        .league-header { background-color: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .team-logo { height: 60px; object-fit: contain; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">⚽ Football Stats App</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="text-center mb-5">Championnats suivis</h1>
+
+    <div th:each="league : ${leagues}" class="mb-5">
+
+        <div class="league-header d-flex align-items-center border shadow-sm">
+            <h2 class="m-0" th:text="${league.name}">Ligue 1</h2>
+            <span class="badge bg-secondary ms-3" th:text="${league.country}">France</span>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5 g-4">
+            <div class="col" th:each="team : ${league.teams}">
+                <a th:href="@{/team/{id}(id=${team.id})}" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm team-card text-center py-3">
+                        <img th:src="${team.crestUrl}" class="team-logo mx-auto d-block" alt="Logo">
+                        <div class="card-body">
+                            <h5 class="card-title fs-6" th:text="${team.name}">PSG</h5>
+                            <small class="text-muted" th:text="${team.tla}">PSG</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

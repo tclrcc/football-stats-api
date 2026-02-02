@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${team.name}">Détails Équipe</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">⚽ Football Stats App</a>
+        <a href="/" class="btn btn-outline-light btn-sm">← Retour</a>
+    </div>
+</nav>
+
+<div class="container mb-5">
+
+    <div class="card shadow mb-4">
+        <div class="card-body text-center">
+            <img th:src="${team.crestUrl}" width="120" class="mb-3">
+            <h1 class="display-5" th:text="${team.name}">Nom Equipe</h1>
+            <p class="text-muted">
+                <span th:if="${team.foundedYear}">Fondé en <span th:text="${team.foundedYear}">1900</span> | </span>
+                <span th:text="${team.stadium}">Stade</span>
+            </p>
+            <p><a th:if="${team.website}" th:href="${team.website}" target="_blank" class="btn btn-sm btn-primary">Site Officiel</a></p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">Entraîneur</div>
+                <div class="card-body" th:if="${team.coach != null}">
+                    <h4 class="card-title" th:text="${team.coach.name}">Nom Coach</h4>
+                    <p class="card-text">
+                        <strong>Nationalité:</strong> <span th:text="${team.coach.nationality}">Fr</span><br>
+                        <strong>Date naissance:</strong> <span th:text="${team.coach.dateOfBirth}">01/01/1970</span>
+                    </p>
+                </div>
+                <div class="card-body" th:if="${team.coach == null}">
+                    <p class="text-muted">Aucun entraîneur enregistré.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span>Effectif</span>
+                    <span class="badge bg-light text-dark" th:text="${team.players.size()} + ' joueurs'">25</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Nom</th>
+                                <th>Position</th>
+                                <th>Nationalité</th>
+                                <th>Âge</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="player : ${team.players}">
+                                <td><i class="bi bi-person"></i></td>
+                                <td class="fw-bold" th:text="${player.name}">Mbappé</td>
+
+                                <td>
+                                <span th:if="${player.position != null}"
+                                      class="badge"
+                                      th:classappend="${player.position.badgeColor}"
+                                      th:text="${player.position.frenchLabel}">
+                                    Attaquant
+                                </span>
+                                    <span th:if="${player.position == null}" class="text-muted">Inconnu</span>
+                                </td>
+                                <td th:text="${player.nationality}">France</td>
+                                <td th:text="${player.dateOfBirth}">2000-01-01</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

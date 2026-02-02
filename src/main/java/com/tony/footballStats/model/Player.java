@@ -12,7 +12,10 @@ public class Player {
     private Long id; // On garde l'ID de l'API
 
     private String name;
-    private String position;
+
+    @Enumerated(EnumType.STRING)
+    private Position position;
+
     private String nationality;
     private LocalDate dateOfBirth;
 

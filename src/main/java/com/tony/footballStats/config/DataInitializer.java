@@ -2,6 +2,7 @@ package com.tony.footballStats.config;
 
 import com.tony.footballStats.model.League;
 import com.tony.footballStats.repository.LeagueRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
     private final LeagueRepository leagueRepository;
-
-    public DataInitializer(LeagueRepository leagueRepository) {
-        this.leagueRepository = leagueRepository;
-    }
 
     @Override
     public void run(String... args) {

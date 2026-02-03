@@ -22,4 +22,7 @@ public class Player {
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
+
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
+    private PlayerStats stats;
 }

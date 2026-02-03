@@ -65,7 +65,13 @@
                         <tbody>
                             <tr th:each="player : ${team.players}">
                                 <td><i class="bi bi-person"></i></td>
-                                <td class="fw-bold" th:text="${player.name}">Mbappé</td>
+                                <td>
+                                    <a th:href="@{/player/{id}(id=${player.id})}"
+                                       class="text-decoration-none fw-bold text-dark hover-primary"
+                                       th:text="${player.name}">
+                                        Mbappé
+                                    </a>
+                                </td>
 
                                 <td>
                                 <span th:if="${player.position != null}"

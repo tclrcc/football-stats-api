@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${player.name}">Détails Joueur</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-5">
+    <div class="container">
+        <a class="navbar-brand" href="/">⚽ Football Stats App</a>
+        <a th:href="@{/team/{id}(id=${player.team.id})}" class="btn btn-outline-light btn-sm">
+            ← Retour à l'équipe
+        </a>
+    </div>
+</nav>
+
+<div class="container d-flex justify-content-center">
+    <div class="card shadow-lg" style="width: 500px;">
+        <div class="card-header text-white text-center py-4"
+             th:classappend="${player.position != null ? player.position.badgeColor : 'bg-secondary'}">
+
+            <h1 class="display-6 mb-0" th:text="${player.name}">Nom Joueur</h1>
+            <div class="mt-2">
+                <span class="badge bg-light text-dark border"
+                      th:if="${player.position != null}"
+                      th:text="${player.position.frenchLabel}">Poste</span>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="list-group list-group-flush">
+
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-flag-fill me-2 text-primary"></i> Nationalité</span>
+                    <span class="fw-bold" th:text="${player.nationality}">France</span>
+                </div>
+
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cake2-fill me-2 text-danger"></i> Date de naissance</span>
+                    <span class="fw-bold" th:text="${player.dateOfBirth}">01/01/2000</span>
+                </div>
+
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-shield-shaded me-2 text-success"></i> Club Actuel</span>
+                    <span class="fw-bold" th:text="${player.team.name}">PSG</span>
+                </div>
+
+                <div th:if="${player.stats != null}" class="mt-4">
+                    <h5 class="border-bottom pb-2 mb-3">Saison <span th:text="${player.stats.season}">2023</span></h5>
+
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-2">
+                                    <h3 class="mb-0" th:text="${player.stats.goals}">10</h3>
+                                    <small class="text-muted">Buts</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-2">
+                                    <h3 class="mb-0" th:text="${player.stats.assists}">5</h3>
+                                    <small class="text-muted">Passes</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="card bg-light border-0">
+                                <div class="card-body p-2">
+                                    <h3 class="mb-0" th:text="${player.stats.appearances}">30</h3>
+                                    <small class="text-muted">Matchs</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="card bg-warning text-white border-0">
+                                <div class="card-body p-2">
+                                    <h3 class="mb-0" th:text="${player.stats.rating}">7.5</h3>
+                                    <small>Note</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${player.stats == null}" class="alert alert-secondary mt-3">
+                    <small>⏳ Statistiques détaillées en cours de récupération...</small>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card-footer text-center bg-white border-0 pb-4">
+            <a th:href="@{/team/{id}(id=${player.team.id})}" class="btn btn-primary">
+                Voir l'effectif complet
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
